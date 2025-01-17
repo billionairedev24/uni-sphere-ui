@@ -13,7 +13,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50">
+    <nav className="border-b bg-white/95 backdrop-blur-sm fixed w-full z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
@@ -29,7 +29,7 @@ export const Navbar = () => {
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>Academics</NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <div className="grid gap-3 p-4 w-[400px]">
+                      <div className="grid gap-3 p-4 w-[400px] bg-white shadow-lg rounded-md">
                         <NavigationMenuLink 
                           className="block p-3 hover:bg-accent rounded-md cursor-pointer"
                           onClick={() => navigate("/academics")}
@@ -50,11 +50,6 @@ export const Navbar = () => {
                   <NavigationMenuItem>
                     <Button variant="ghost" onClick={() => navigate("/admissions")}>
                       Admissions
-                    </Button>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Button variant="ghost" onClick={() => navigate("/courses")}>
-                      Courses
                     </Button>
                   </NavigationMenuItem>
                 </NavigationMenuList>
