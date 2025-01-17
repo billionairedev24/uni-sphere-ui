@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -16,20 +24,46 @@ export const Navbar = () => {
               EduPlatform
             </h1>
             <div className="hidden md:flex items-center space-x-6">
-              <Button variant="ghost" onClick={() => navigate("/courses")}>
-                Courses
-              </Button>
-              <Button variant="ghost" onClick={() => navigate("/about")}>
-                About
-              </Button>
-              <Button variant="ghost" onClick={() => navigate("/admissions")}>
-                Admissions
-              </Button>
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Academics</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid gap-3 p-4 w-[400px]">
+                        <NavigationMenuLink 
+                          className="block p-3 hover:bg-accent rounded-md cursor-pointer"
+                          onClick={() => navigate("/academics")}
+                        >
+                          <div className="text-sm font-medium">Programs & Departments</div>
+                          <div className="text-sm text-muted-foreground">Explore our academic offerings</div>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink 
+                          className="block p-3 hover:bg-accent rounded-md cursor-pointer"
+                          onClick={() => navigate("/faculty")}
+                        >
+                          <div className="text-sm font-medium">Faculty & Research</div>
+                          <div className="text-sm text-muted-foreground">Meet our distinguished faculty</div>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => navigate("/admissions")}>
+                      Admissions
+                    </Button>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => navigate("/courses")}>
+                      Courses
+                    </Button>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate("/login")}>
-              Login
+            <Button variant="ghost" onClick={() => navigate("/portal")}>
+              Student Portal
             </Button>
             <Button onClick={() => navigate("/apply")}>Apply Now</Button>
           </div>
