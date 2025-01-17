@@ -13,7 +13,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="border-b bg-white/95 backdrop-blur-sm fixed w-full z-50">
+    <nav className="border-b bg-white fixed w-full z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
@@ -39,7 +39,7 @@ export const Navbar = () => {
                         </NavigationMenuLink>
                         <NavigationMenuLink 
                           className="block p-3 hover:bg-accent rounded-md cursor-pointer"
-                          onClick={() => navigate("/faculty")}
+                          onClick={() => navigate("/faculty/computer-science")}
                         >
                           <div className="text-sm font-medium">Faculty & Research</div>
                           <div className="text-sm text-muted-foreground">Meet our distinguished faculty</div>
@@ -60,7 +60,7 @@ export const Navbar = () => {
             <Button variant="ghost" onClick={() => navigate("/portal")}>
               Student Portal
             </Button>
-            <Button onClick={() => navigate("/apply")}>Apply Now</Button>
+            <Button onClick={() => navigate("/apply/general")}>Apply Now</Button>
           </div>
         </div>
       </div>
