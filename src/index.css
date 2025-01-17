@@ -93,15 +93,16 @@
   }
 }
 
-/* Add styles for Select component dropdown */
-[data-radix-select-content] {
-  @apply bg-popover border border-border shadow-md z-[100] !important;
-}
+@layer components {
+  [data-radix-select-content] {
+    @apply bg-white border border-border shadow-md z-[100] !important;
+  }
 
-[data-radix-select-viewport] {
-  @apply bg-popover !important;
-}
+  [data-radix-select-viewport] {
+    @apply bg-white !important;
+  }
 
-[data-radix-select-item] {
-  @apply bg-popover hover:bg-accent hover:text-accent-foreground !important;
+  [data-radix-select-item] {
+    @apply bg-white hover:bg-accent hover:text-accent-foreground !important;
+  }
 }
