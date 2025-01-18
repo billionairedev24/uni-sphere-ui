@@ -51,6 +51,13 @@ const CourseApplication = () => {
   const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [application, setApplication] = useState<ApplicationData | null>(null);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!mockAuthService.currentUser && !showLogin) {
+      setShowLogin(true);
+    }
+  }, [showLogin]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,7 +92,9 @@ const CourseApplication = () => {
           education: existing.education.background,
           statement: existing.statement,
         });
-        setDocuments(existing.documents);
+        if (existing.documents) {
+          setDocuments(existing.documents as UploadedDocument[]);
+        }
       }
     };
 
