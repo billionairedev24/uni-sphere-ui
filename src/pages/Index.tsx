@@ -31,7 +31,7 @@ const Index = () => {
               Explore Courses
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/apply")}>
+            <Button size="lg" variant="outline" onClick={() => navigate("/apply/general")}>
               Apply Now
             </Button>
           </div>

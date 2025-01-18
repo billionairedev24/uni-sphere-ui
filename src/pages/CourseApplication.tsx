@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,16 +26,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { LoginForm } from "@/components/LoginForm";
 import { mockAuthService } from "@/services/mockAuth";
-import { mockApplicationService, ApplicationData } from "@/services/mockApplications";
+import { mockApplicationService } from "@/services/mockApplications";
 import { createCheckoutSession } from "@/services/mockStripe";
-import { UploadedDocument } from "@/services/mockStorage";
+import { mockCourses } from "@/api/mocks/courses";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  program: z.string().min(1, "Please select a program"),
+  courseId: z.string().min(1, "Please select a course"),
   education: z.string().min(1, "Please provide your educational background"),
   statement: z.string().min(100, "Personal statement must be at least 100 characters"),
 });
@@ -44,6 +44,7 @@ const APPLICATION_FEE = 50;
 
 const CourseApplication = () => {
   const { department } = useParams();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [documents, setDocuments] = useState<UploadedDocument[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,7 +58,7 @@ const CourseApplication = () => {
       lastName: "",
       email: "",
       phone: "",
-      program: "",
+      courseId: "",
       education: "",
       statement: "",
     },
@@ -79,7 +80,7 @@ const CourseApplication = () => {
           lastName: existing.personalInfo.lastName,
           email: existing.personalInfo.email,
           phone: existing.personalInfo.phone,
-          program: existing.education.level,
+          courseId: existing.education.level,
           education: existing.education.background,
           statement: existing.statement,
         });
@@ -107,7 +108,6 @@ const CourseApplication = () => {
 
     setLoading(true);
     try {
-      // Save application progress
       await mockApplicationService.saveProgress({
         userId: mockAuthService.currentUser.id,
         department: department || "general",
@@ -118,7 +118,7 @@ const CourseApplication = () => {
           phone: values.phone,
         },
         education: {
-          level: values.program,
+          level: values.courseId,
           background: values.education,
         },
         documents,
@@ -126,7 +126,6 @@ const CourseApplication = () => {
         status: "submitted",
       });
 
-      // Create checkout session
       const session = await createCheckoutSession(values.email);
       
       toast({
@@ -134,7 +133,6 @@ const CourseApplication = () => {
         description: "Your application has been received. Proceeding to payment...",
       });
 
-      // Simulate payment success
       setTimeout(() => {
         toast({
           title: "Payment Successful",
@@ -245,20 +243,22 @@ const CourseApplication = () => {
 
               <FormField
                 control={form.control}
-                name="program"
+                name="courseId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Program</FormLabel>
+                    <FormLabel>Select Course</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a program" />
+                          <SelectValue placeholder="Select a course" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="undergraduate">Undergraduate</SelectItem>
-                        <SelectItem value="graduate">Graduate</SelectItem>
-                        <SelectItem value="phd">Ph.D.</SelectItem>
+                        {mockCourses.map((course) => (
+                          <SelectItem key={course.id} value={course.id}>
+                            {course.title}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

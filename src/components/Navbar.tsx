@@ -48,6 +48,11 @@ export const Navbar = () => {
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                   <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => navigate("/courses")}>
+                      Explore Courses
+                    </Button>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
                     <Button variant="ghost" onClick={() => navigate("/admissions")}>
                       Admissions
                     </Button>

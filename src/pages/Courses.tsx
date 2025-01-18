@@ -1,18 +1,29 @@
 import { useState } from "react";
 import { mockCourses } from "@/api/mocks/courses";
 import { CourseCard } from "@/components/CourseCard";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 6;
 
 const Courses = () => {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredCourses = mockCourses.filter((course) => {
     const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
     const matchesLevel = level === "all" || course.level.toLowerCase() === level;
     return matchesSearch && matchesLevel;
   });
+
+  const totalPages = Math.ceil(filteredCourses.length / ITEMS_PER_PAGE);
+  const paginatedCourses = filteredCourses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="container mx-auto px-4 py-24 min-h-screen animate-fadeIn">
@@ -44,10 +55,27 @@ const Courses = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCourses.map((course) => (
+        {paginatedCourses.map((course) => (
           <CourseCard key={course.id} course={course} />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-8 flex justify-center">
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i + 1}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                className="join-item"
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

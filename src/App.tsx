@@ -10,6 +10,7 @@ import Admissions from "./pages/Admissions";
 import Portal from "./pages/Portal";
 import CourseApplication from "./pages/CourseApplication";
 import FacultyView from "./pages/FacultyView";
+import Courses from "./pages/Courses";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/academics" element={<Academics />} />
               <Route path="/admissions" element={<Admissions />} />
               <Route path="/portal" element={<Portal />} />
+              <Route path="/courses" element={<Courses />} />
               <Route path="/apply/:department" element={<CourseApplication />} />
               <Route path="/faculty/:department" element={<FacultyView />} />
             </Routes>
