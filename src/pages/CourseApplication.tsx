@@ -26,9 +26,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { LoginForm } from "@/components/LoginForm";
 import { mockAuthService } from "@/services/mockAuth";
-import { mockApplicationService } from "@/services/mockApplications";
+import { mockApplicationService, ApplicationData } from "@/services/mockApplications";
 import { createCheckoutSession } from "@/services/mockStripe";
 import { mockCourses } from "@/api/mocks/courses";
+import { UploadedDocument } from "@/services/mockStorage";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
