@@ -47,6 +47,7 @@ const CourseApplication = () => {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<UploadedDocument[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [application, setApplication] = useState<ApplicationData | null>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -91,11 +92,7 @@ const CourseApplication = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!mockAuthService.currentUser) {
-      toast({
-        title: "Authentication required",
-        description: "Please login to submit your application.",
-        variant: "destructive",
-      });
+      setShowLogin(true);
       return;
     }
 
@@ -156,16 +153,16 @@ const CourseApplication = () => {
     }
   };
 
-  if (!mockAuthService.isAuthenticated()) {
+  if (showLogin) {
     return (
       <div className="container max-w-md mx-auto px-4 py-8">
         <Alert className="mb-6">
           <AlertTitle>Authentication Required</AlertTitle>
           <AlertDescription>
-            Please login to continue with your application.
+            Please login or create an account to continue with your application.
           </AlertDescription>
         </Alert>
-        <LoginForm onSuccess={() => {}} />
+        <LoginForm onSuccess={() => setShowLogin(false)} />
       </div>
     );
   }
