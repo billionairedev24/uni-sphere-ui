@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -21,9 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { createCheckoutSession } from "@/services/mockStripe";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { DocumentUpload } from "@/components/DocumentUpload";
+import { LoginForm } from "@/components/LoginForm";
+import { mockAuthService } from "@/services/mockAuth";
+import { mockApplicationService, ApplicationData } from "@/services/mockApplications";
+import { createCheckoutSession } from "@/services/mockStripe";
+import { UploadedDocument } from "@/services/mockStorage";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -33,14 +38,16 @@ const formSchema = z.object({
   program: z.string().min(1, "Please select a program"),
   education: z.string().min(1, "Please provide your educational background"),
   statement: z.string().min(100, "Personal statement must be at least 100 characters"),
-  documents: z.boolean().refine((val) => val, "You must agree to submit required documents"),
 });
 
-const APPLICATION_FEE = 50; // Application fee in USD
+const APPLICATION_FEE = 50;
 
 const CourseApplication = () => {
   const { department } = useParams();
   const { toast } = useToast();
+  const [documents, setDocuments] = useState<UploadedDocument[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [application, setApplication] = useState<ApplicationData | null>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,23 +59,85 @@ const CourseApplication = () => {
       program: "",
       education: "",
       statement: "",
-      documents: false,
     },
   });
 
+  useEffect(() => {
+    const loadExistingApplication = async () => {
+      if (!mockAuthService.currentUser) return;
+      
+      const existing = await mockApplicationService.getApplication(
+        mockAuthService.currentUser.id,
+        department || "general"
+      );
+      
+      if (existing) {
+        setApplication(existing);
+        form.reset({
+          firstName: existing.personalInfo.firstName,
+          lastName: existing.personalInfo.lastName,
+          email: existing.personalInfo.email,
+          phone: existing.personalInfo.phone,
+          program: existing.education.level,
+          education: existing.education.background,
+          statement: existing.statement,
+        });
+        setDocuments(existing.documents);
+      }
+    };
+
+    loadExistingApplication();
+  }, [department, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!mockAuthService.currentUser) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (documents.length === 0) {
+      toast({
+        title: "Documents required",
+        description: "Please upload at least one document.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
     try {
-      // Create a checkout session
+      // Save application progress
+      await mockApplicationService.saveProgress({
+        userId: mockAuthService.currentUser.id,
+        department: department || "general",
+        personalInfo: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phone: values.phone,
+        },
+        education: {
+          level: values.program,
+          background: values.education,
+        },
+        documents,
+        statement: values.statement,
+        status: "submitted",
+      });
+
+      // Create checkout session
       const session = await createCheckoutSession(values.email);
       
-      // In a real application, you would redirect to the Stripe Checkout page
-      // For this mock implementation, we'll show a success message
       toast({
         title: "Application Submitted",
         description: "Your application has been received. Proceeding to payment...",
       });
 
-      // Simulate payment success after 2 seconds
+      // Simulate payment success
       setTimeout(() => {
         toast({
           title: "Payment Successful",
@@ -79,11 +148,27 @@ const CourseApplication = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was an error processing your payment. Please try again.",
+        description: "There was an error processing your application. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (!mockAuthService.isAuthenticated()) {
+    return (
+      <div className="container max-w-md mx-auto px-4 py-8">
+        <Alert className="mb-6">
+          <AlertTitle>Authentication Required</AlertTitle>
+          <AlertDescription>
+            Please login to continue with your application.
+          </AlertDescription>
+        </Alert>
+        <LoginForm onSuccess={() => {}} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-16">
@@ -91,7 +176,7 @@ const CourseApplication = () => {
         <div className="bg-white rounded-lg shadow-lg p-8 animate-fadeIn">
           <h1 className="text-3xl font-bold text-primary mb-2">Course Application</h1>
           <p className="text-gray-600 mb-4">
-            {department ? department.split("-").join(" ") : "Department"} Application Form
+            {department ? department.split("-").join(" ") : "General"} Application Form
           </p>
 
           <Alert className="mb-6">
@@ -169,7 +254,7 @@ const CourseApplication = () => {
                     <FormLabel>Program</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger>
                           <SelectValue placeholder="Select a program" />
                         </SelectTrigger>
                       </FormControl>
@@ -219,25 +304,24 @@ const CourseApplication = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="documents"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        I agree to submit all required documents including transcripts and certificates
-                      </FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormLabel>Required Documents</FormLabel>
+                <DocumentUpload
+                  onUploadComplete={(doc) => setDocuments(prev => [...prev, doc])}
+                />
+                {documents.map((doc) => (
+                  <div key={doc.id} className="flex items-center justify-between p-2 bg-secondary/20 rounded">
+                    <span>{doc.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDocuments(prev => prev.filter(d => d.id !== doc.id))}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
 
               <div className="mt-6 p-4 bg-secondary/20 rounded-lg">
                 <p className="text-sm text-gray-600 mb-2">
@@ -245,8 +329,8 @@ const CourseApplication = () => {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full">
-                Submit Application and Pay ${APPLICATION_FEE}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Processing..." : `Submit Application and Pay $${APPLICATION_FEE}`}
               </Button>
             </form>
           </Form>
