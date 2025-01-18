@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { createCheckoutSession } from "@/services/mockStripe";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -33,6 +35,8 @@ const formSchema = z.object({
   statement: z.string().min(100, "Personal statement must be at least 100 characters"),
   documents: z.boolean().refine((val) => val, "You must agree to submit required documents"),
 });
+
+const APPLICATION_FEE = 50; // Application fee in USD
 
 const CourseApplication = () => {
   const { department } = useParams();
@@ -52,12 +56,33 @@ const CourseApplication = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast({
-      title: "Application Submitted",
-      description: "We will review your application and get back to you soon.",
-    });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      // Create a checkout session
+      const session = await createCheckoutSession(values.email);
+      
+      // In a real application, you would redirect to the Stripe Checkout page
+      // For this mock implementation, we'll show a success message
+      toast({
+        title: "Application Submitted",
+        description: "Your application has been received. Proceeding to payment...",
+      });
+
+      // Simulate payment success after 2 seconds
+      setTimeout(() => {
+        toast({
+          title: "Payment Successful",
+          description: "Your application fee has been processed successfully.",
+        });
+      }, 2000);
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -65,9 +90,16 @@ const CourseApplication = () => {
       <div className="container max-w-2xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-8 animate-fadeIn">
           <h1 className="text-3xl font-bold text-primary mb-2">Course Application</h1>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 mb-4">
             {department ? department.split("-").join(" ") : "Department"} Application Form
           </p>
+
+          <Alert className="mb-6">
+            <AlertTitle>Application Fee Required</AlertTitle>
+            <AlertDescription>
+              A non-refundable application fee of ${APPLICATION_FEE} USD is required to process your application.
+            </AlertDescription>
+          </Alert>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -207,8 +239,14 @@ const CourseApplication = () => {
                 )}
               />
 
+              <div className="mt-6 p-4 bg-secondary/20 rounded-lg">
+                <p className="text-sm text-gray-600 mb-2">
+                  By submitting this form, you agree to pay the non-refundable application fee of ${APPLICATION_FEE} USD.
+                </p>
+              </div>
+
               <Button type="submit" className="w-full">
-                Submit Application
+                Submit Application and Pay ${APPLICATION_FEE}
               </Button>
             </form>
           </Form>
