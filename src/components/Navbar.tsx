@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { mockAuthService } from "@/services/mockAuth";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,6 +12,7 @@ import {
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const isStudent = mockAuthService.currentUser?.role === "student";
 
   return (
     <nav className="border-b bg-white fixed w-full z-50 shadow-sm">
@@ -62,10 +64,13 @@ export const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate("/portal")}>
-              Student Portal
-            </Button>
-            <Button onClick={() => navigate("/apply/general")}>Apply Now</Button>
+            {isStudent ? (
+              <Button variant="ghost" onClick={() => navigate("/portal")}>
+                Student Portal
+              </Button>
+            ) : (
+              <Button onClick={() => navigate("/apply/general")}>Apply Now</Button>
+            )}
           </div>
         </div>
       </div>
