@@ -170,7 +170,10 @@ const CourseApplication = () => {
             Please login or create an account to continue with your application.
           </AlertDescription>
         </Alert>
-        <LoginForm onSuccess={() => setShowLogin(false)} />
+        <LoginForm 
+          onSuccess={() => setShowLogin(false)} 
+          onRegisterClick={() => navigate("/apply/register")} 
+        />
       </div>
     );
   }
