@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { mockAuthService } from "@/services/mockAuth";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -35,6 +34,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [loading, setLoading] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const { toast } = useToast();
   
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -95,50 +95,9 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     }
   };
 
-  return (
-    <Tabs defaultValue="login" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="register">Register</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="login">
-        <Form {...loginForm}>
-          <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-            <FormField
-              control={loginForm.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={loginForm.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-        </Form>
-      </TabsContent>
-      
-      <TabsContent value="register">
+  if (isRegistering) {
+    return (
+      <div className="space-y-6">
         <Form {...registerForm}>
           <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
             <FormField
@@ -198,7 +157,65 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             </Button>
           </form>
         </Form>
-      </TabsContent>
-    </Tabs>
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Button
+            variant="link"
+            className="p-0 h-auto font-normal"
+            onClick={() => setIsRegistering(false)}
+          >
+            Login here
+          </Button>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Form {...loginForm}>
+        <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+          <FormField
+            control={loginForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={loginForm.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+      </Form>
+      <p className="text-center text-sm text-muted-foreground">
+        Don't have an account?{" "}
+        <Button
+          variant="link"
+          className="p-0 h-auto font-normal"
+          onClick={() => setIsRegistering(true)}
+        >
+          Register here
+        </Button>
+      </p>
+    </div>
   );
 };
