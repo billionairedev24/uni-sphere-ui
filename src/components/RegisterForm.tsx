@@ -14,44 +14,49 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { mockAuthService } from "@/services/mockAuth";
-import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
-interface LoginFormProps {
+interface RegisterFormProps {
   onSuccess: () => void;
-  onRegisterClick: () => void;
+  onLoginClick: () => void;
 }
 
-export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
+export const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await mockAuthService.login(values.email, values.password);
+      await mockAuthService.register(values.email, values.password, values.name);
       toast({
         title: "Success",
-        description: "You have been logged in successfully.",
+        description: "Your account has been created successfully.",
       });
       onSuccess();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Invalid credentials. Please try again.",
+        description: "There was an error creating your account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -62,12 +67,26 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Welcome Back</h1>
-        <p className="text-gray-600">Please sign in to continue</p>
+        <h1 className="text-2xl font-bold">Create Account</h1>
+        <p className="text-gray-600">Sign up to get started</p>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter your full name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="email"
@@ -89,7 +108,21 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Enter your password" {...field} />
+                  <Input type="password" placeholder="Create a password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Confirm your password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,16 +130,16 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
           />
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
       </Form>
 
       <div className="text-center">
         <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Button variant="link" onClick={onRegisterClick} className="p-0">
-            Register here
+          Already have an account?{" "}
+          <Button variant="link" onClick={onLoginClick} className="p-0">
+            Sign in here
           </Button>
         </p>
       </div>
