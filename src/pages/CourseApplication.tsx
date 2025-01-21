@@ -164,12 +164,6 @@ const CourseApplication = () => {
   if (showLogin) {
     return (
       <div className="container max-w-md mx-auto px-4 py-8">
-        <Alert className="mb-6">
-          <AlertTitle>Authentication Required</AlertTitle>
-          <AlertDescription>
-            Please login or create an account to continue with your application.
-          </AlertDescription>
-        </Alert>
         <LoginForm 
           onSuccess={() => setShowLogin(false)} 
           onRegisterClick={() => navigate("/apply/register")} 

@@ -66,7 +66,6 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
           <div className="flex justify-center mb-6">
             <img src="/placeholder.svg" alt="Logo" className="h-12 w-auto" />
           </div>
-          <h1 className="text-2xl font-bold text-primary">Welcome Back</h1>
           <p className="text-gray-600">Please sign in to continue your application</p>
         </div>
 
