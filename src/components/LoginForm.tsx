@@ -60,55 +60,64 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Welcome Back</h1>
-        <p className="text-gray-600">Please sign in to continue</p>
-      </div>
+    <div className="w-full max-w-md mx-auto">
+      <div className="bg-white shadow-xl rounded-lg p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center mb-6">
+            <img src="/placeholder.svg" alt="Logo" className="h-12 w-auto" />
+          </div>
+          <h1 className="text-2xl font-bold text-primary">Welcome Back</h1>
+          <p className="text-gray-600">Please sign in to continue your application</p>
+        </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your email" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Enter your password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter your password" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </Form>
 
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Button variant="link" onClick={onRegisterClick} className="p-0">
-            Register here
-          </Button>
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Button 
+              variant="link" 
+              onClick={() => navigate("/apply/register")} 
+              className="p-0 text-primary hover:text-primary/80"
+            >
+              Register here
+            </Button>
+          </p>
+        </div>
       </div>
     </div>
   );

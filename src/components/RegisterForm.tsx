@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { mockAuthService } from "@/services/mockAuth";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -33,6 +34,7 @@ interface RegisterFormProps {
 export const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,83 +67,92 @@ export const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => 
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Create Account</h1>
-        <p className="text-gray-600">Sign up to get started</p>
-      </div>
+    <div className="w-full max-w-md mx-auto">
+      <div className="bg-white shadow-xl rounded-lg p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center mb-6">
+            <img src="/placeholder.svg" alt="Logo" className="h-12 w-auto" />
+          </div>
+          <h1 className="text-2xl font-bold text-primary">Create Account</h1>
+          <p className="text-gray-600">Sign up to start your application</p>
+        </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your full name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your full name" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your email" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Create a password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Create a password" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Confirm your password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Confirm your password" className="bg-gray-50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Create Account"}
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating account..." : "Create Account"}
+            </Button>
+          </form>
+        </Form>
 
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
-          Already have an account?{" "}
-          <Button variant="link" onClick={onLoginClick} className="p-0">
-            Sign in here
-          </Button>
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <Button 
+              variant="link" 
+              onClick={() => navigate("/apply/login")} 
+              className="p-0 text-primary hover:text-primary/80"
+            >
+              Sign in here
+            </Button>
+          </p>
+        </div>
       </div>
     </div>
   );
