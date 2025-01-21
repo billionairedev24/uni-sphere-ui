@@ -110,7 +110,7 @@ export const LoginForm = ({ onSuccess, onRegisterClick }: LoginFormProps) => {
             Don't have an account?{" "}
             <Button 
               variant="link" 
-              onClick={() => navigate("/apply/register")} 
+              onClick={onRegisterClick}
               className="p-0 text-primary hover:text-primary/80"
             >
               Register here
